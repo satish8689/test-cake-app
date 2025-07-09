@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "productImage": "/cake-img/Milk Chocolate.webp",
+    "productTitle": "Wireless Headphones",
+    "price": 2999,
+    "note": "20% off on first purchase",
+    "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life."
+  },
+  {
+    "id": "2",
+    "productImage": "https://example.com/images/product-2.jpg",
+    "productTitle": "Smart Watch",
+    "price": "555",
+    "note": "Limited stock available",
+    "description": "Fitness tracking smartwatch with heart rate monitor and Bluetooth connectivity.",
+    "originalPrice": "5555",
+    "rating": "3.9",
+    "reviewCount": "45"
+  },
+  {
+    "id": "3",
+    "productImage": "https://example.com/images/product-3.jpg",
+    "productTitle": "Bluetooth Speaker",
+    "price": 1599,
+    "note": "Buy 1 Get 1 Free",
+    "description": "Portable Bluetooth speaker with deep bass and waterproof design."
+  },
+  {
+    "id": "4",
+    "productImage": "/cake-img/c9gu7saig9rrwywkb9q0c8b7e.webp",
+    "productTitle": "Laptop Stand",
+    "price": 899,
+    "note": "Free shipping on orders above ₹1000",
+    "description": "Adjustable aluminum laptop stand for better ergonomics and cooling.",
+    "originalPrice": "444",
+    "rating": "4.5",
+    "reviewCount": "5"
+  },
+  {
+    "id": "5",
+    "productImage": "/cake-img/x2xoivfjpz5m4rounuxua2l30.webp",
+    "productTitle": "Test Cake",
+    "price": 1299,
+    "note": "New Arrival",
+    "description": "Multiport USB-C hub with HDMI, USB 3.0, and SD card reader support."
+  },
+  {
+    "id": "1752065505395"
+  },
+  {
+    "id": "1752066510735",
+    "productImage": "/cake-img/ryg1keh4vvevvhcfa3cmm6icm.webp",
+    "productTitle": "sdfs",
+    "price": "34",
+    "originalPrice": "67",
+    "note": "tr",
+    "description": "Using the Print Screen Key in Windows 11 and Windows 10 Press the Windows logo key + PrtScr key together. On tablets, press the Windows logo button + the volume down button together. (The screenshot is saved in the Screenshots folder in the Pictures folder.)",
+    "rating": "3.5",
+    "reviewCount": "5"
+  }
+]
