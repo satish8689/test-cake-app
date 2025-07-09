@@ -6,12 +6,11 @@ import styles from './products.module.scss';
 import OrderSummary from '../orderSummary.js';
 import { toast } from 'react-toastify';
 
-// import item from '../data/item.json';
-
 export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [search, setSearch] = useState('');
+    const [priceRange, setPriceRange] = useState('');
     const [icProducts, setIcProducts] = useState([]);
     const [showOrderSummary, setShowOrderSummary] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,30 +32,14 @@ export default function ProductList() {
         getProducts();
     }, []);
 
-    // async function getIcProducts() {
-    //     let result = await fetch('/api/ic_product');
-    //     let res = await result.json();
-    //     if (res && res.length > 0) {
-    //         setIcProducts(res);
-    //         return res;
-    //     }
-    // }
-
     async function getProducts() {
-        // const resultIcProduct = await getIcProducts();
         let apiresult = await fetch('/api/products');
-        let { data } = await apiresult.json()
+        let { data } = await apiresult.json();
         if (data.length > 0) {
-            let productObj = data.map(iterator => {
-                return {
-                    // productTitle:iterator,
-                    // productImage: iterator,
-                    ...iterator
-                };
-            });
+            let productObj = data.map(iterator => ({ ...iterator }));
             setProducts(productObj);
         }
-        setIsLoading(false); // Hide loader after fetching
+        setIsLoading(false);
     }
 
     const handleToggleWishlist = (productId) => {
@@ -65,23 +48,11 @@ export default function ProductList() {
                 ? prev.filter(id => id !== productId)
                 : [...prev, productId]
         );
-        toast.success("Wishlist updated!", {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
+        toast.success("Wishlist updated!", { position: "top-center", autoClose: 3000 });
     };
 
     useEffect(() => {
-        if (selectedProduct) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
+        document.body.style.overflow = selectedProduct ? 'hidden' : '';
     }, [selectedProduct]);
 
     const handleAddToCart = (productId, quantity) => {
@@ -89,7 +60,6 @@ export default function ProductList() {
         if (!selectPro) return;
 
         let numericQuantity = parseFloat(quantity);
-        // let quantityInKg = quantity.includes("kg") ? numericQuantity : numericQuantity / 1000;
         let totalPrice = numericQuantity * selectPro.price;
 
         setSelectedProducts(prev => {
@@ -115,32 +85,12 @@ export default function ProductList() {
 
             return updatedProducts;
         });
-        toast.success("Product added!", {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
+
+        toast.success("Product added!", { position: "top-center", autoClose: 3000 });
     };
 
-    const handleOrder = () => {
-        setShowOrderSummary(true);
-    };
-
-    const handleGoBack = () => {
-        setShowOrderSummary(false);
-    };
-
-    if (showOrderSummary) {
-        return <OrderSummary selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} goBack={handleGoBack} />;
-    }
-
-    const filteredProducts = products.filter(product =>
-        !search || (product.productTitle && product.productTitle.toLowerCase().includes(search.toLowerCase()))
-    );
+    const handleOrder = () => setShowOrderSummary(true);
+    const handleGoBack = () => setShowOrderSummary(false);
 
     const handlePopupSubmit = () => {
         if (!userName.trim() || !userMobile.trim()) {
@@ -157,10 +107,32 @@ export default function ProductList() {
         setShowPopup(false);
     };
 
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = !search || (product.productTitle && product.productTitle.toLowerCase().includes(search.toLowerCase()));
+
+        let matchesPrice = true;
+        const price = parseFloat(product.price);
+        if (priceRange === 'below500') matchesPrice = price < 500;
+        else if (priceRange === '500to1000') matchesPrice = price >= 500 && price <= 1000;
+        else if (priceRange === 'above1000') matchesPrice = price > 1000;
+
+        return matchesSearch && matchesPrice;
+    });
+
+    if (showOrderSummary) {
+        return (
+            <OrderSummary
+                selectedProducts={selectedProducts}
+                setSelectedProducts={setSelectedProducts}
+                goBack={handleGoBack}
+            />
+        );
+    }
+
     return (
         <>
             <div className={styles.header}>
-                <div className={styles.shopName}>My Shop</div><br />
+                <div className={styles.shopName}>Shree Maa Laxmi Cakes</div><br />
                 <div className={styles.searchBoxCont}>
                     <input
                         type="text"
@@ -169,8 +141,19 @@ export default function ProductList() {
                         onChange={(e) => setSearch(e.target.value)}
                         className={styles.searchBox}
                     />
+                    <select
+                        value={priceRange}
+                        onChange={(e) => setPriceRange(e.target.value)}
+                        className={styles.priceFilterDropdown}
+                    >
+                        <option value="">All</option>
+                        <option value="below500">Below ₹500</option>
+                        <option value="500to1000">₹500 - ₹1000</option>
+                        <option value="above1000">Above ₹1000</option>
+                    </select>
                 </div>
             </div>
+
             <div className={styles.container}>
                 {showPopup && (
                     <div className={styles.popup}>
@@ -190,84 +173,68 @@ export default function ProductList() {
                                 onChange={(e) => setUserMobile(e.target.value)}
                                 className={styles.input}
                             />
-                            <button onClick={handlePopupSubmit} className={styles.submitButton}>
-                                Submit
-                            </button>
+                            <button onClick={handlePopupSubmit} className={styles.submitButton}>Submit</button>
                         </div>
                     </div>
                 )}
-
-
 
                 {isLoading ? (
                     <div className={styles.loadercontainer}><div className={styles.loader}></div></div>
                 ) : (
                     <div className={styles.productList}>
                         {filteredProducts.length > 0 ? (
-                            filteredProducts.map((product) => {
-                                return (
-                                    <div key={product.id} className={styles.productCard} onClick={() => setSelectedProduct(product)}>
-                                        <div className={styles.wishlistIcon} onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleToggleWishlist(product.id);
-                                        }}>
-                                            {wishlist.includes(product.id) ? <img
-                                                src={'icon/redheart.png'}
-                                                alt={'Add to cart'}
-                                                className={styles.wishlistIconImg}
-                                            /> : <img
-                                                src={'icon/blackheart.png'}
-                                                alt={'Add to cart'}
-                                                className={styles.wishlistIconImg}
-                                            />}
-                                        </div>
+                            filteredProducts.map((product) => (
+                                <div key={product.id} className={styles.productCard} onClick={() => setSelectedProduct(product)}>
+                                    <div className={styles.wishlistIcon} onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleToggleWishlist(product.id);
+                                    }}>
                                         <img
-                                            src={product.productImage}
-                                            alt={product.productTitle}
-                                            className={styles.productImage}
+                                            src={wishlist.includes(product.id) ? 'icon/redheart.png' : 'icon/blackheart.png'}
+                                            alt="Wishlist"
+                                            className={styles.wishlistIconImg}
                                         />
-                                        <div className={styles.productDetails}>
-                                            <div className={styles.actions}>
-                                                <span className={styles.productTitle}>{product.productTitle}</span>
-
-                                            </div>
-                                            {/* <span className={styles.productPrice}>Rs {product.price}</span> */}
-                                            {/* <span className={styles.productNote}>{product.description}</span> */}
-                                            {/* <span className={styles.productNote}><span>Note:</span>{product.note}</span> */}
-                                        </div>
-                                        <div className={styles.priceRow}>
-                                            <span className={styles.productPrice}>₹{product.price}</span>
-                                            <span className={styles.originalPrice}>₹899</span>
-                                            <span className={styles.discount}>12% OFF</span>
-                                        </div>
-
-                                        <div className={styles.reviewRow}>
-                                            <span className={styles.rating}>4.9</span>
-                                            <span className={styles.star}>★</span>
-                                            <span className={styles.reviewCount}>(159 Reviews)</span>
-                                        </div>
-                                        <button type="button" className={styles.addToCard} 
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // ✅ Prevent click from bubbling up
-                                            handleAddToCart(product.id, 1); // or your custom function
-                                        }}>
-                                            {/* <img
-                                            src={'icon/cart.png'}
-                                            alt={'Add to cart'}
-                                            className={styles.addToCardImgIcon}
-                                        />  */}
-                                            Add To Card</button>
                                     </div>
-                                );
-                            })
+                                    <img
+                                        src={product.productImage}
+                                        alt={product.productTitle}
+                                        className={styles.productImage}
+                                    />
+                                    <div className={styles.productDetails}>
+                                        <div className={styles.actions}>
+                                            <span className={styles.productTitle}>{product.productTitle}</span>
+                                        </div>
+                                    </div>
+                                    <div className={styles.priceRow}>
+                                        <span className={styles.productPrice}>₹{product.price}</span>
+                                        <span className={styles.originalPrice}>₹899</span>
+                                        <span className={styles.discount}>12% OFF</span>
+                                    </div>
+                                    <div className={styles.reviewRow}>
+                                        <span className={styles.rating}>4.9</span>
+                                        <span className={styles.star}>★</span>
+                                        <span className={styles.reviewCount}>(159 Reviews)</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={styles.addToCard}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(product.id, 1);
+                                        }}
+                                    >
+                                        Add To Card
+                                    </button>
+                                </div>
+                            ))
                         ) : (
                             <p>No products available</p>
                         )}
                     </div>
                 )}
-
                 <button onClick={handleOrder} className={styles.orderButton}>Order Summary</button>
             </div>
+
             {selectedProduct && (
                 <div className={styles.modalOverlay} onClick={() => setSelectedProduct(null)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -276,25 +243,23 @@ export default function ProductList() {
                             <div className={styles.modalHeader}>
                                 <h2 className={styles.productTitleDetails}>{selectedProduct.productTitle}</h2>
                                 <div className={styles.wishlisDetailstIcon} onClick={() => handleToggleWishlist(selectedProduct.id)}>
-                                    {wishlist.includes(selectedProduct.id) ? <img
-                                        src={'icon/redheart.png'}
-                                        alt={'Add to cart'}
+                                    <img
+                                        src={wishlist.includes(selectedProduct.id) ? 'icon/redheart.png' : 'icon/blackheart.png'}
+                                        alt="Wishlist"
                                         className={styles.wishlistIconImg}
-                                    /> : <img
-                                        src={'icon/blackheart.png'}
-                                        alt={'Add to cart'}
-                                        className={styles.wishlistIconImg}
-                                    />}
+                                    />
                                 </div>
                             </div>
-
-                            <img src={selectedProduct.productImage} className={styles.productImageDetails} alt={selectedProduct.productTitle} />
+                            <img
+                                src={selectedProduct.productImage}
+                                className={styles.productImageDetails}
+                                alt={selectedProduct.productTitle}
+                            />
                             <div className={styles.priceRowDetails}>
                                 <span className={styles.productPriceDetails}>₹{selectedProduct.price}</span>
                                 <span className={styles.originalPriceDetails}>₹899</span>
                                 <span className={styles.discountDetails}>12% OFF</span>
                             </div>
-
                             <div className={styles.reviewRowDetails}>
                                 <span className={styles.ratingDetails}>4.9</span>
                                 <span className={styles.starDetails}>★</span>
@@ -302,12 +267,11 @@ export default function ProductList() {
                             </div>
                             <p><strong>Note:</strong> {selectedProduct.note}</p>
                             <p><strong>Description:</strong> {selectedProduct.description}</p>
-                            <button type="button" className={styles.addToCardDetails}>  Add To Card</button>
+                            <button type="button" className={styles.addToCardDetails}>Add To Card</button>
                         </div>
                     </div>
                 </div>
             )}
         </>
-
     );
 }
