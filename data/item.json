@@ -46,7 +46,14 @@
     "description": "Multiport USB-C hub with HDMI, USB 3.0, and SD card reader support."
   },
   {
-    "id": "1752065505395"
+    "id": "1752065505395",
+    "productTitle": "Rg",
+    "price": "456",
+    "originalPrice": "67",
+    "note": "Test",
+    "description": "RGF",
+    "rating": "4.5",
+    "reviewCount": "5"
   },
   {
     "id": "1752066510735",
