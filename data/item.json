@@ -1,16 +1,5 @@
 [
   {
-    "id": "1",
-    "productImage": "/cake-img/Milk Chocolate.webp",
-    "productTitle": "Milk Chocolate Cake",
-    "price": 499,
-    "originalPrice": 599,
-    "note": "20% off on first purchase",
-    "description": "Delicious milk chocolate cake topped with smooth frosting.",
-    "rating": "4.6",
-    "reviewCount": "124"
-  },
-  {
     "id": "2",
     "productImage": "/cake-img/4aad80f4dd370a0f1a2a88fb133ea300.jpg",
     "productTitle": "Luxury Cake",
