@@ -100,39 +100,5 @@
     "deliveryDateTime": "2025-07-10T15:30:00.000Z",
     "id": "1752145286442",
     "status": "In-Progress"
-  },
-  {
-    "name": "RR Satish",
-    "mobileNumber": "8602148699",
-    "order": [
-      {
-        "id": "1",
-        "title": "Milk Chocolate Cake",
-        "productImage": "/cake-img/Milk Chocolate.webp",
-        "price": 499,
-        "quantity": 1,
-        "proTotalPrice": 499
-      },
-      {
-        "id": "3",
-        "title": "Bluetooth Speaker",
-        "productImage": "/cake-img/1219_1000.jpg",
-        "price": 1599,
-        "quantity": 1,
-        "proTotalPrice": 1599
-      },
-      {
-        "id": "5",
-        "title": "Strawberry Cake",
-        "productImage": "/cake-img/Butterscotch-Cake-For-Worlds-Best-Mom-4.jpeg",
-        "price": 599,
-        "quantity": 1,
-        "proTotalPrice": 599
-      }
-    ],
-    "createdAt": "2025-07-10T11:11:09.046Z",
-    "deliveryDateTime": "2025-07-15T06:30:00.000Z",
-    "id": "1752145869065",
-    "status": "Done"
   }
 ]
