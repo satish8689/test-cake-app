@@ -54,21 +54,30 @@ export default function Admin() {
             <table className={styles.table}>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Mobile</th>
+                        {/* <th>ID</th> */}
+                        <th>Name/Mobile</th>
+                        {/* <th>Mobile</th> */}
+                        <th>Products</th>
                         <th>Status</th>
                         <th>Delivery Date</th>
-                        <th>Products</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map((order) => (
                         <tr key={order.id}>
-                            <td>{order.id}</td>
-                            <td>{order.name}</td>
-                            <td>{order.mobileNumber}</td>
+                            {/* <td>{order.id}</td> */}
+                            <td>{order.name} <br/> {order.mobileNumber}
+                            </td>
+                            {/* <td></td> */}
+                            <td>
+                                {order.order.map((item) => (
+                                    <div key={item.id} style={{ marginBottom: '5px' }}>
+                                        <img src={item.productImage} alt={item.title} width="50" />
+                                        <div>{item.title} - ₹{item.price} × {item.quantity}</div>
+                                    </div>
+                                ))}
+                            </td>
                             <td>
                                 <select
                                     value={order.status || "Pending"}
@@ -79,19 +88,12 @@ export default function Admin() {
                                     <option value="Done">Done</option>
                                 </select>
                             </td>
-                            <td>{new Date(order.deliveryDateTime).toLocaleDateString('en-GB', {
+                            <td className={styles.ddate}><strong>{new Date(order.deliveryDateTime).toLocaleDateString('en-GB', {
                                 day: '2-digit',
                                 month: 'short',
                                 year: 'numeric'
-                            })}</td>
-                            <td>
-                                {order.order.map((item) => (
-                                    <div key={item.id} style={{ marginBottom: '5px' }}>
-                                        <img src={item.productImage} alt={item.title} width="50" />
-                                        <div>{item.title} - ₹{item.price} × {item.quantity}</div>
-                                    </div>
-                                ))}
-                            </td>
+                            })}</strong></td>
+                           
                             <td>
                                 <button onClick={() => handleDelete(order.id)}><FaTrash /></button>
                             </td>

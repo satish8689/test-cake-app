@@ -66,12 +66,12 @@ export default function Admin() {
         <>
         <div className={styles.container}>
             <h1 className={styles.title}>Welcome to Admin Panel</h1>
-            <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/icproduct'}>Common Product</button>
             {/* Admin functionalities go here */}
         </div>
         <div className={styles.container}>
         <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/myorders'}>My Order</button>
         <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/shopproduct'}>Shop Product</button>
+            {/* <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/icproduct'}>Common Product</button> */}
         {/* Admin functionalities go here */}
     </div></>
     );

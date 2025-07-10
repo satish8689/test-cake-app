@@ -5,7 +5,7 @@ import formidable from 'formidable';
 
 export const config = {
     api: {
-        bodyParser: false,
+        bodyParser: false, // disable for form-data
     },
 };
 
@@ -13,14 +13,17 @@ const filePath = path.join(process.cwd(), 'data', 'item.json');
 
 export default async function handler(req, res) {
     try {
-        const fileData = await fsPromises.readFile(filePath, 'utf8'); // ✅ FIXED
+        const fileData = await fsPromises.readFile(filePath, 'utf8');
         let items = JSON.parse(fileData);
 
         if (req.method === 'GET') {
             return res.status(200).json({ data: items });
         }
 
-        if (req.method === 'POST' && req.headers['content-type']?.includes('multipart/form-data')) {
+        if (
+            req.method === 'POST' &&
+            req.headers['content-type']?.includes('multipart/form-data')
+        ) {
             const uploadDir = path.join(process.cwd(), 'public', 'cake-img');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
@@ -46,56 +49,60 @@ export default async function handler(req, res) {
             return;
         }
 
-        if (req.method === 'POST') {
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk;
-            });
+        if (
+            req.method === 'POST' &&
+            req.headers['content-type']?.includes('application/json')
+        ) {
+            const buffers = [];
+            for await (const chunk of req) {
+                buffers.push(chunk);
+            }
+            const body = Buffer.concat(buffers).toString();
+            const newItem = JSON.parse(body);
+            newItem.id = Date.now().toString();
+            items.push(newItem);
 
-            req.on('end', async () => {
-                const newItem = JSON.parse(body);
-                newItem.id = Date.now().toString();
-                items.push(newItem);
-
-                await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2));
-
-                return res.status(201).json({ message: 'Item added', item: newItem });
-            });
-
-            return;
+            await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2));
+            return res.status(201).json({ message: 'Item added', item: newItem });
         }
 
-        if (req.method === 'PUT' && req.headers['content-type']?.includes('application/json')) {
-            let body = '';
+        if (
+            req.method === 'PUT' &&
+            req.headers['content-type']?.includes('application/json')
+        ) {
+            const buffers = [];
+            for await (const chunk of req) {
+                buffers.push(chunk);
+            }
+            const body = Buffer.concat(buffers).toString();
+            const updatedItem = JSON.parse(body);
 
-            req.on('data', chunk => {
-                body += chunk;
-            });
+            items = items.map(item =>
+                item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+            );
 
-            req.on('end', async () => {
-                const updatedItem = JSON.parse(body);
-
-                items = items.map(item =>
-                    item.id === updatedItem.id ? { ...item, ...updatedItem } : item
-                );
-
-                await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2));
-
-                return res.status(200).json({ message: 'Item updated', item: updatedItem });
-            });
-
-            return;
+            await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2));
+            return res.status(200).json({ message: 'Item updated', item: updatedItem });
         }
 
-        if (req.method === 'DELETE') {
-            const { id } = req.body;
-            items = items.filter((item) => item.id !== id);
-            await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2)); // ✅ FIXED
+        if (
+            req.method === 'DELETE' &&
+            req.headers['content-type']?.includes('application/json')
+        ) {
+            const buffers = [];
+            for await (const chunk of req) {
+                buffers.push(chunk);
+            }
+            const body = Buffer.concat(buffers).toString();
+            const { id } = JSON.parse(body);
+
+            items = items.filter(item => item.id !== id);
+            await fsPromises.writeFile(filePath, JSON.stringify(items, null, 2));
+
             return res.status(200).json({ message: 'Item deleted', id });
         }
 
         return res.status(405).json({ error: 'Method Not Allowed' });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Something went wrong' });
