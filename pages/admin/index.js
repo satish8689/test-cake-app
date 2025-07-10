@@ -70,6 +70,7 @@ export default function Admin() {
             {/* Admin functionalities go here */}
         </div>
         <div className={styles.container}>
+        <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/myorders'}>My Order</button>
         <button className={styles.hrefButton} onClick={() => window.location.href = '/admin/shopproduct'}>Shop Product</button>
         {/* Admin functionalities go here */}
     </div></>
