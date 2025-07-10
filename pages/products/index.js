@@ -86,7 +86,7 @@ export default function ProductList() {
             return updatedProducts;
         });
 
-        toast.success("Product added!", { position: "top-center", autoClose: 3000 });
+        toast.success("Product added!", { position: "top-center", autoClose: 3000, className: 'customSuccessToast' });
     };
 
     const handleOrder = () => setShowOrderSummary(true);
@@ -105,6 +105,10 @@ export default function ProductList() {
 
         localStorage.setItem('userInfo', JSON.stringify({ name: userName, mobile: userMobile }));
         setShowPopup(false);
+    };
+
+    const handleUserProfile = () => {
+        setShowPopup(true);
     };
 
     const filteredProducts = products.filter(product => {
@@ -132,7 +136,7 @@ export default function ProductList() {
     return (
         <>
             <div className={styles.header}>
-                <div className={styles.shopName}>Shree Maa Laxmi Cakes</div><br />
+                <div className={styles.shopName}>Shree Maa Laxmi Cakes</div>
                 <div className={styles.searchBoxCont}>
                     <input
                         type="text"
@@ -168,7 +172,7 @@ export default function ProductList() {
                             />
                             <input
                                 type="tel"
-                                placeholder="Enter Mobile Number"
+                                placeholder="Enter Whatsapp Number"
                                 value={userMobile}
                                 onChange={(e) => setUserMobile(e.target.value)}
                                 className={styles.input}
@@ -207,24 +211,58 @@ export default function ProductList() {
                                     </div>
                                     <div className={styles.priceRow}>
                                         <span className={styles.productPrice}>₹{product.price}</span>
-                                        <span className={styles.originalPrice}>₹899</span>
-                                        <span className={styles.discount}>12% OFF</span>
+                                        <span className={styles.originalPrice}>₹{product.originalPrice}</span>
+                                        {product.originalPrice > product.price && (
+                                        <span className={styles.discount}>
+                                            {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                                        </span>
+                                        )}
                                     </div>
                                     <div className={styles.reviewRow}>
-                                        <span className={styles.rating}>4.9</span>
+                                        <span className={styles.rating}>{product.rating}</span>
                                         <span className={styles.star}>★</span>
-                                        <span className={styles.reviewCount}>(159 Reviews)</span>
+                                        <span className={styles.reviewCount}>({product.reviewCount} Reviews)</span>
                                     </div>
-                                    <button
-                                        type="button"
-                                        className={styles.addToCard}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddToCart(product.id, 1);
-                                        }}
-                                    >
-                                        Add To Card
-                                    </button>
+                                    {selectedProducts.some(p => p.id === product.id) ? (
+                                        <div className={styles.qtyButtons}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const existing = selectedProducts.find(p => p.id === product.id);
+                                                    if (existing.quantity > 1) {
+                                                        handleAddToCart(product.id, existing.quantity - 1);
+                                                    } else {
+                                                        handleAddToCart(product.id, '');
+                                                    }
+                                                }}
+                                            >
+                                                −
+                                            </button>
+                                            <span>
+                                                {selectedProducts.find(p => p.id === product.id)?.quantity}
+                                            </span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const existing = selectedProducts.find(p => p.id === product.id);
+                                                    handleAddToCart(product.id, Number(existing.quantity) + 1);
+                                                }}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className={styles.addToCard}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(product.id, 1);
+                                            }}
+                                        >
+                                            Add To Cart
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         ) : (
@@ -232,7 +270,12 @@ export default function ProductList() {
                         )}
                     </div>
                 )}
-                <button onClick={handleOrder} className={styles.orderButton}>Order Summary</button>
+                <br />
+                <br />
+                <div className={styles.bottomBarRow}>
+                    <button onClick={handleUserProfile} className={styles.userProfileButton}>User Profile</button>
+                    <button onClick={handleOrder} className={styles.orderButton}>Order Summary</button>
+                </div>
             </div>
 
             {selectedProduct && (
@@ -240,6 +283,12 @@ export default function ProductList() {
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <button onClick={() => setSelectedProduct(null)} className={styles.closeBtn}>×</button>
                         <div className={styles.modalContentWithButton}>
+                            
+                            <img
+                                src={selectedProduct.productImage}
+                                className={styles.productImageDetails}
+                                alt={selectedProduct.productTitle}
+                            />
                             <div className={styles.modalHeader}>
                                 <h2 className={styles.productTitleDetails}>{selectedProduct.productTitle}</h2>
                                 <div className={styles.wishlisDetailstIcon} onClick={() => handleToggleWishlist(selectedProduct.id)}>
@@ -250,24 +299,64 @@ export default function ProductList() {
                                     />
                                 </div>
                             </div>
-                            <img
-                                src={selectedProduct.productImage}
-                                className={styles.productImageDetails}
-                                alt={selectedProduct.productTitle}
-                            />
                             <div className={styles.priceRowDetails}>
-                                <span className={styles.productPriceDetails}>₹{selectedProduct.price}</span>
-                                <span className={styles.originalPriceDetails}>₹899</span>
-                                <span className={styles.discountDetails}>12% OFF</span>
+                                 <span className={styles.productPrice}>₹{selectedProduct.price}</span>
+                                        <span className={styles.originalPrice}>₹{selectedProduct.originalPrice}</span>
+                                        {selectedProduct.originalPrice > selectedProduct.price && (
+                                        <span className={styles.discount}>
+                                            {Math.round(((selectedProduct.originalPrice - selectedProduct.price) / selectedProduct.originalPrice) * 100)}% OFF
+                                        </span>
+                                        )}
                             </div>
                             <div className={styles.reviewRowDetails}>
-                                <span className={styles.ratingDetails}>4.9</span>
+                                <span className={styles.ratingDetails}>{selectedProduct.rating}</span>
                                 <span className={styles.starDetails}>★</span>
-                                <span className={styles.reviewCountDetails}>(159 Reviews)</span>
+                                <span className={styles.reviewCountDetails}>({selectedProduct.reviewCount} Reviews)</span>
                             </div>
                             <p><strong>Note:</strong> {selectedProduct.note}</p>
                             <p><strong>Description:</strong> {selectedProduct.description}</p>
-                            <button type="button" className={styles.addToCardDetails}>Add To Card</button>
+                            {/* <button type="button" className={styles.addToCardDetails}>Add To Card</button> */}
+
+                            {selectedProducts.some(p => p.id === selectedProduct.id) ? (
+                                <div className={styles.qtyButtonsDetails}>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const existing = selectedProducts.find(p => p.id === selectedProduct.id);
+                                            if (existing.quantity > 1) {
+                                                handleAddToCart(selectedProduct.id, existing.quantity - 1);
+                                            } else {
+                                                handleAddToCart(selectedProduct.id, '');
+                                            }
+                                        }}
+                                    >
+                                        −
+                                    </button>
+                                    <span>
+                                        {selectedProducts.find(p => p.id === selectedProduct.id)?.quantity}
+                                    </span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const existing = selectedProducts.find(p => p.id === selectedProduct.id);
+                                            handleAddToCart(selectedProduct.id, Number(existing.quantity) + 1);
+                                        }}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className={styles.addToCardDetails}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAddToCart(selectedProduct.id, 1);
+                                    }}
+                                >
+                                    Add To Cart
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
